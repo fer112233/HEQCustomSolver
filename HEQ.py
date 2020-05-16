@@ -14,7 +14,6 @@ import shutil
 from pygame.locals import *
 import time
 from progress.bar import Bar
-from progress.spinner import Spinner
 from ctypes import windll, Structure, c_long, byref
 # Fin de la importación.
 
@@ -202,6 +201,11 @@ for k in Bar("Aplicando la FFT Inversa").iter(range(len(t))):
 
 # Ahora eliminamos el formato de parte real e imaginaria, nos quedamos con lo real para poder usarlo en el plot.
 u = u.real
+
+# Creamos una carpeta output para guardar los resultados
+if not os.path.exists("output"):
+    os.makedirs("output")
+# Fin de la creacion de la carpeta
 
 # Limpiamos la carpeta output de la anterior ejecución.
 files = glob.glob('output/*')
