@@ -148,14 +148,13 @@ x = np.arange(0, L, dx)
 # La función fft.fftfreq nos da las frecuencias de muestreo de la transformada de fourier dadas una Longitud y el paso.
 kappa = 2*np.pi*np.fft.fftfreq(N, d=dx)
 
-# A lo largo de los calculos, usamos el objeto Bar() y Spinner() que nos ayuda a mostrar una barra del estado de la operación.
-# No afecta a la funcionalidad.
+print("Calculando (puede tardar unos minutos si los cálculos son complejos)...")
 
 # Inicializamos una matriz llena de ceros que llamamos u_inicial del mismo tamaño que la cantidad de puntos de la barra...
 # ... que hemos decidido estudiar, especificando la precisión.
 u_inicial = np.zeros_like(x)
 # Iteramos cada valor que hemos sacado del dibujo de la función inicial
-for valorx in Bar("Estableciendo condiciones iniciales").iter(puntos):
+for valorx in puntos:
     # Añadimos cada uno de esos puntos dibujados a la nueva matriz que hemos inicializado.
     u_inicial[int(valorx)] = int(yproporcional(puntos[valorx]))
 
@@ -175,8 +174,6 @@ dt = 0.1
 # Lista de todos los puntos de t, desde 0 hasta la variable tiempo, con paso de la variable dt.
 t = np.arange(0, tiempo, dt)
 
-spinner = Spinner('Calculando ODEs')
-
 # En la función derivar, calculamos las derivadas de cada punto en un instante t usando el concepto de FFT.
 def derivar(uhat_deconstruido, t, kappa, cteDifu):
     # Reconstruimos la matriz a una con parte real e imaginaria en el mismo lugar.
@@ -185,8 +182,6 @@ def derivar(uhat_deconstruido, t, kappa, cteDifu):
     d_uhat = -cteDifu**2 * (np.power(kappa,2)) * uhat
     # Deconstruimos la matriz a una con parte real seguida con la parte imaginaria.
     d_uhat_deconstruido = np.concatenate((d_uhat.real,d_uhat.imag)).astype('float64')
-
-    spinner.next()
 
     return d_uhat_deconstruido
 
@@ -210,7 +205,7 @@ u = u.real
 
 # Limpiamos la carpeta output de la anterior ejecución.
 files = glob.glob('output/*')
-for f in Bar("Eliminando archivos residuales").iter(files):
+for f in files:
     os.remove(f)
 # Fin de la limpieza.
 
@@ -220,7 +215,7 @@ plt.style.use('dark_background')
 ax = fig.add_subplot(111, projection='3d')
 plt.set_cmap('hot')
 u_plot = u[0:-1:10, :]
-for j in Bar("Creando los plot en 3D").iter(range(u_plot.shape[0])):
+for j in range(u_plot.shape[0]):
     ys = j*np.ones(u_plot.shape[1])
     ax.plot(x, ys, u_plot[j, :], alpha=0.5, color=cm.rainbow(j*20))
     # Guardamos cada iteración en la carpeta output para posterior creación de video.
