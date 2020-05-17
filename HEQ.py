@@ -4,6 +4,7 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from moviepy.editor import VideoFileClip
 from scipy.integrate import odeint
 plt.rcParams['figure.figsize'] = [12, 12]
 plt.rcParams.update({'font.size': 18})
@@ -13,7 +14,6 @@ import pygame
 import shutil
 from pygame.locals import *
 import time
-from progress.bar import Bar
 from ctypes import windll, Structure, c_long, byref
 # Fin de la importación.
 
@@ -130,7 +130,6 @@ ciniciales()
 pygame.quit()
 # Fin de la ventana que pregunta por condiciones iniciales y le permite dibujar en ella.
 
-print(f"Condiciones iniciales introducidas -> {puntos}")
 # Preguntamos por la iteración del tiempo.
 tiempo = float(input("   -> Introduce la cantidad de tiempo que quieres ver evolucionar tus condiciones iniciales (predeterminado = 20): ") or "20")
 print(f"      -> {tiempo}")
@@ -195,7 +194,7 @@ uhat = uhat_deconstruido[:, :N] + (1j) * uhat_deconstruido[:, N:]
 u = np.zeros_like(uhat)
 
 # Iteramos por cada valor de t.
-for k in Bar("Aplicando la FFT Inversa").iter(range(len(t))):
+for k in range(len(t)):
     # Aplicamos la FTT inversa con la función fft.ifft de numpy.
     u[k, :] = np.fft.ifft(uhat[k, :])
 
@@ -234,9 +233,8 @@ plt.figure()
 plt.imshow(np.flipud(u), aspect=8)
 plt.axis('off')
 plt.show()
-plt.savefig('output/out2D.png', bbox_inches='tight')
 # Fin del plot 2D.
-print("Imagen 3D y 2D resultado guardadas en la carpeta output.")
+print("Imagen 3D resultado guardada en la carpeta output.")
 
 
 # Creamos un video a partir de todas las imagenes creadas que se encuentran en la carpeta output.
@@ -246,7 +244,6 @@ os.system(f"ffmpeg -r {FPS} -i output/out%03d.png -vcodec libx264 -y videoSoluci
 print("Video creado y guardado en esta misma carpeta. Reproduciendo...")
 
 # Abrimos el video automáticamente y lo reproducimos 2 veces.
-from moviepy.editor import *
 pygame.display.set_caption('Video resultado final')
 
 clip = VideoFileClip('videoSolucion.mp4')
