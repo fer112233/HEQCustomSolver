@@ -1,10 +1,11 @@
 # Importamos todas las librerias que usamos.
 import os
 import glob
+import subprocess
 import numpy as np
+import sys
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from moviepy.editor import VideoFileClip
 from scipy.integrate import odeint
 plt.rcParams['figure.figsize'] = [12, 12]
 plt.rcParams.update({'font.size': 18})
@@ -37,6 +38,13 @@ def onTop(window):
     SetWindowPos(window, -1, rc.left, rc.top, 0, 0, 0x0001)
 
 # Fin de el setup del primer plano.
+
+# Código para buscar librerias en el .exe
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+# Fin de la búsqueda.
 
 # Aqui preguntamos por cada variable que necesitemos.
 columns = shutil.get_terminal_size().columns
@@ -239,17 +247,12 @@ print("Imagen 3D resultado guardada en la carpeta output.")
 
 # Creamos un video a partir de todas las imagenes creadas que se encuentran en la carpeta output.
 FPS = 24
-os.system(f"ffmpeg -r {FPS} -i output/out%03d.png -vcodec libx264 -y videoSolucion.mp4")
+ffmpeg_path = "ffmpeg/ffmpeg.exe"
+p = subprocess.Popen(f"{resource_path(ffmpeg_path)} -r {FPS} -i output/out%03d.png -vcodec libx264 -crf 0 -y videoSolucion.mp4", shell=True)
 # Fin de la creación del video
 print("Video creado y guardado en esta misma carpeta. Reproduciendo...")
 
 # Abrimos el video automáticamente y lo reproducimos 2 veces.
-pygame.display.set_caption('Video resultado final')
-
-clip = VideoFileClip('videoSolucion.mp4')
-clip.preview()
-time.sleep(1)
-clip.preview()
-
-pygame.quit()
+ffplay_path = "ffmpeg/ffplay.exe"
+p = subprocess.Popen(f'{resource_path(ffplay_path)} -loop 10 videoSolucion.mp4', shell=True)
 # Fin.
